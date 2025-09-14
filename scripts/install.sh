@@ -45,35 +45,20 @@ api_base="https://api.github.com/repos/${owner_repo}/releases"
 
 # Desired tag (optional): set FASTAUTO_VERSION=vX.Y.Z
 TAG="${FASTAUTO_VERSION:-}"
-ASSET_URL=""
-
-fetch_asset_url() {
-  local api_url="$1"
-  info "querying $api_url"
-  # Grep the browser_download_url that matches OS/ARCH tar.gz
-  if ! curl -fsSL -H "Accept: application/vnd.github+json" -H "User-Agent: $UA" "$api_url" >"$TMP/release.json"; then
-    return 1
-  fi
-  ASSET_URL="$(grep -Eo '"browser_download_url"\s*:\s*"[^"]+"' "$TMP/release.json" \
-    | sed -E 's/"browser_download_url"\s*:\s*"(.*)"/\1/' \
-    | grep -E "/${PROJECT}_[^"]+_${OS}_${ARCH}\.tar\.gz$" \
-    | head -n1 || true)"
-  [[ -n "$ASSET_URL" ]]
-}
-
 if [[ -n "$TAG" ]]; then
-  TAG="${TAG#v}"; TAG="v${TAG}" # ensure v-prefix
-  if ! fetch_asset_url "${api_base}/tags/${TAG}"; then
-    # Fallback to constructed URL if API blocked
-    ASSET_URL="https://github.com/${owner_repo}/releases/download/${TAG}/${PROJECT}_${TAG#v}_${OS}_${ARCH}.tar.gz"
-  fi
+  TAG="v${TAG#v}"
 else
-  if ! fetch_asset_url "${api_base}/latest"; then
-    err "failed to query latest release; set FASTAUTO_VERSION=vX.Y.Z and retry"
-    exit 1
-  fi
+  # Resolve latest tag via redirect without parsing JSON
+  latest_url=$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/${owner_repo}/releases/latest")
+  TAG=$(sed -E 's#.*/tag/(v[^/]+)$#\1#' <<<"$latest_url")
 fi
 
+if [[ -z "$TAG" ]]; then
+  err "failed to determine release tag; set FASTAUTO_VERSION=vX.Y.Z and retry"
+  exit 1
+fi
+
+ASSET_URL="https://github.com/${owner_repo}/releases/download/${TAG}/${PROJECT}_${TAG#v}_${OS}_${ARCH}.tar.gz"
 info "downloading $ASSET_URL"
 ARCHIVE="$TMP/${PROJECT}.tar.gz"
 curl -fL --retry 3 --retry-delay 1 -o "$ARCHIVE" "$ASSET_URL"
@@ -105,4 +90,3 @@ case ":$PATH:" in
 esac
 
 "$DEST" version || true
-
