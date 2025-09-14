@@ -83,6 +83,7 @@ Webhook Secret (for Webhook Mode)
   - Secret: paste the value from the global config file
   - Events: “Just the push event”
 - Rotate anytime: `fastauto secret rotate` (then update the webhook Secret in GitHub).
+  - Show current value locally: `fastauto secret show`
 
 Git Credentials for Autopull
 - The server must be able to `git pull` your repo:
@@ -116,6 +117,7 @@ Commands Reference
 - `logs [-f]`: Shows journald logs for the running service.
 - `deploy --now`: Pulls latest and runs `./deploy.sh` once.
 - `secret rotate`: Rotates the webhook secret in the global config (keep GitHub in sync).
+- `secret show`: Prints the current webhook secret and config path.
 - `uninstall`: Stops, disables, and removes the systemd unit.
 - `version`: Prints version info.
 

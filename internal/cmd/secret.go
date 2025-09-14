@@ -25,7 +25,23 @@ var secretRotateCmd = &cobra.Command{
     },
 }
 
-func init() {
-    secretCmd.AddCommand(secretRotateCmd)
+var secretShowCmd = &cobra.Command{
+    Use:   "show",
+    Short: "Print the current webhook HMAC secret",
+    RunE: func(cmd *cobra.Command, args []string) error {
+        g, _ := config.LoadGlobalConfig()
+        if g.WebhookSecret == "" {
+            fmt.Println("No secret set. Generate one with: fastauto secret rotate")
+            fmt.Printf("Config: %s\n", config.GlobalPath())
+            return nil
+        }
+        fmt.Printf("Secret: %s\n", g.WebhookSecret)
+        fmt.Printf("Config: %s\n", config.GlobalPath())
+        return nil
+    },
 }
 
+func init() {
+    secretCmd.AddCommand(secretRotateCmd)
+    secretCmd.AddCommand(secretShowCmd)
+}

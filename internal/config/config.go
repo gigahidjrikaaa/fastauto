@@ -79,6 +79,9 @@ func globalPath() string {
     return filepath.Join(xdg, "fastauto", "config.yml")
 }
 
+// GlobalPath returns the absolute path to the global config file
+func GlobalPath() string { return globalPath() }
+
 func SaveRepoConfig(path string, c *RepoConfig) error {
     b, err := yaml.Marshal(c)
     if err != nil { return err }
