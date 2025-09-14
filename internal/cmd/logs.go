@@ -18,12 +18,12 @@ var logsCmd = &cobra.Command{
         mode := viper.GetString("mode")
         unit := "fastauto-webhook.service"
         if mode == "runner" { unit = "fastauto-runner.service" }
-        args := []string{"-u", unit}
-        if logsFollow { args = append(args, "-f") }
-        c := exec.Command("journalctl", args...)
+        jArgs := []string{"-u", unit}
+        if logsFollow { jArgs = append(jArgs, "-f") }
+        c := exec.Command("journalctl", jArgs...)
         c.Stdout = os.Stdout
         c.Stderr = os.Stderr
-        fmt.Printf("journalctl %v\n", args)
+        fmt.Printf("journalctl %v\n", jArgs)
         return c.Run()
     },
 }
@@ -31,4 +31,3 @@ var logsCmd = &cobra.Command{
 func init() {
     logsCmd.Flags().BoolVarP(&logsFollow, "follow", "f", false, "follow logs")
 }
-
