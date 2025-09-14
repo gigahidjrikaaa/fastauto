@@ -66,6 +66,16 @@ go build -o bin/fastauto ./cmd/fastauto
 fastauto version
 ```
 
+Option C — Curl installer (no Go needed):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gigahidjrikaaa/fastauto/main/scripts/install.sh | bash
+# pin to a version (e.g., v0.1.0):
+FASTAUTO_VERSION=v0.1.0 curl -fsSL https://raw.githubusercontent.com/gigahidjrikaaa/fastauto/main/scripts/install.sh | bash
+# install system-wide (requires root):
+curl -fsSL https://raw.githubusercontent.com/gigahidjrikaaa/fastauto/main/scripts/install.sh | sudo FASTAUTO_BIN_DIR=/usr/local/bin bash
+```
+
 ### From source (needs Go 1.22+)
 
 ```bash
