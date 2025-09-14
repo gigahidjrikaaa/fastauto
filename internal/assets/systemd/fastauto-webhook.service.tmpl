@@ -1,0 +1,16 @@
+[#] fastauto webhook unit
+[Unit]
+Description={{.Description}}
+After=network.target
+
+[Service]
+Type=simple
+ExecStart={{.ExecStart}}
+Restart=always
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
+

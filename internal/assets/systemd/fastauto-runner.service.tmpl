@@ -1,0 +1,17 @@
+[#] fastauto runner unit
+[Unit]
+Description={{.Description}}
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{.WorkingDirectory}}
+ExecStart={{.ExecStart}}
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
+

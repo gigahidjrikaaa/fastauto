@@ -1,0 +1,17 @@
+name: fastauto
+
+on:
+  push:
+    branches:
+      - {{BRANCHES}}
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run deploy
+        run: |
+          chmod +x ./deploy.sh || true
+          ./deploy.sh
+
