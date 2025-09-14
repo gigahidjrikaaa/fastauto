@@ -22,3 +22,11 @@ var internalServeWebhookCmd = &cobra.Command{
         return webhook.Serve(repo)
     },
 }
+
+func init() {
+    // Optional TLS flags override config
+    internalServeWebhookCmd.Flags().String("tls-cert", "", "path to TLS certificate (PEM)")
+    internalServeWebhookCmd.Flags().String("tls-key", "", "path to TLS key (PEM)")
+    _ = viper.BindPFlag("webhook.tls_cert_file", internalServeWebhookCmd.Flags().Lookup("tls-cert"))
+    _ = viper.BindPFlag("webhook.tls_key_file", internalServeWebhookCmd.Flags().Lookup("tls-key"))
+}

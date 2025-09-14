@@ -23,7 +23,9 @@ type RepoConfig struct {
 
 type WebhookConfig struct {
     Address string `yaml:"address"`
-    // future: path, tls
+    TLSCertFile string `yaml:"tls_cert_file,omitempty"`
+    TLSKeyFile  string `yaml:"tls_key_file,omitempty"`
+    // future: path, tls client auth
 }
 
 type RunnerConfig struct {
@@ -82,4 +84,3 @@ func SaveRepoConfig(path string, c *RepoConfig) error {
     if err != nil { return err }
     return safeio.WriteFileAtomicWithBackup(path, b, 0o644)
 }
-

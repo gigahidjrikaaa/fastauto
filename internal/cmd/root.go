@@ -4,6 +4,7 @@ import (
     "fmt"
     "os"
     "path/filepath"
+    "strings"
 
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
@@ -53,6 +54,7 @@ func initConfig() {
     v := viper.GetViper()
     v.SetConfigType("yaml")
     v.SetEnvPrefix("FASTAUTO")
+    v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
     v.AutomaticEnv()
 
     // Load repo-local config if present
@@ -86,7 +88,11 @@ func initConfig() {
 }
 
 // Execute runs the root command
-func Execute() error { return rootCmd.Execute() }
+func Execute() error {
+    // ensure --version reflects current build info
+    rootCmd.Version = versionString()
+    return rootCmd.Execute()
+}
 
 // Version string
 func versionString() string {

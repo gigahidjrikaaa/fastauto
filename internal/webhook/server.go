@@ -2,11 +2,9 @@ package webhook
 
 import (
     "encoding/json"
-    "fmt"
     "io"
     "log"
     "net/http"
-    "os"
     "strings"
 
     "github.com/spf13/viper"
@@ -26,6 +24,8 @@ func Serve(repo string) error {
     g, _ := config.LoadGlobalConfig()
     addr := viper.GetString("webhook.address")
     if addr == "" { addr = ":8080" }
+    cert := viper.GetString("webhook.tls_cert_file")
+    key := viper.GetString("webhook.tls_key_file")
     mux := http.NewServeMux()
     mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request){ w.WriteHeader(200); _, _ = w.Write([]byte("ok")) })
     mux.HandleFunc("/hook", func(w http.ResponseWriter, r *http.Request) {
@@ -71,8 +71,13 @@ func Serve(repo string) error {
         w.WriteHeader(202)
         _, _ = w.Write([]byte("queued"))
     })
+    srv := &http.Server{Addr: addr, Handler: mux}
+    if cert != "" && key != "" {
+        log.Printf("fastauto webhook TLS listening on %s, repo=%s", addr, repo)
+        return srv.ListenAndServeTLS(cert, key)
+    }
     log.Printf("fastauto webhook listening on %s, repo=%s", addr, repo)
-    return http.ListenAndServe(addr, mux)
+    return srv.ListenAndServe()
 }
 
 // VerifyHMAC checks GitHub signature headers using sha256
@@ -96,4 +101,3 @@ func VerifyHMAC(body []byte, secret, header string) bool {
 }
 
 // for tests we expose via separate file
-
