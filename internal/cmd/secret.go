@@ -5,7 +5,7 @@ import (
 
     "github.com/spf13/cobra"
 
-    "fastauto/internal/config"
+    "github.com/gigahidjrikaaa/fastauto/internal/config"
 )
 
 var secretCmd = &cobra.Command{

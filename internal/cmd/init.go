@@ -10,10 +10,10 @@ import (
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
-    "fastauto/internal/assets"
-    "fastauto/internal/config"
-    "fastauto/internal/gitutil"
-    "fastauto/internal/safeio"
+    "github.com/gigahidjrikaaa/fastauto/internal/assets"
+    "github.com/gigahidjrikaaa/fastauto/internal/config"
+    "github.com/gigahidjrikaaa/fastauto/internal/gitutil"
+    "github.com/gigahidjrikaaa/fastauto/internal/safeio"
 )
 
 var (

@@ -4,7 +4,7 @@ import (
     "log"
     "runtime"
 
-    icmd "fastauto/internal/cmd"
+    icmd "github.com/gigahidjrikaaa/fastauto/internal/cmd"
 )
 
 var (
@@ -21,4 +21,3 @@ func main() {
         log.Fatal(err)
     }
 }
-

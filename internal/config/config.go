@@ -10,7 +10,7 @@ import (
 
     "gopkg.in/yaml.v3"
 
-    "fastauto/internal/safeio"
+    "github.com/gigahidjrikaaa/fastauto/internal/safeio"
 )
 
 type RepoConfig struct {

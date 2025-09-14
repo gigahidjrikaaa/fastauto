@@ -4,7 +4,7 @@ import (
     "os"
     "path/filepath"
 
-    "fastauto/internal/gitutil"
+    "github.com/gigahidjrikaaa/fastauto/internal/gitutil"
 )
 
 // Run pulls latest and runs deploy.sh in repo

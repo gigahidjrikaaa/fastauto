@@ -6,7 +6,7 @@ import (
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
-    "fastauto/internal/deploy"
+    "github.com/gigahidjrikaaa/fastauto/internal/deploy"
 )
 
 var deployNow bool
@@ -30,4 +30,3 @@ var deployCmd = &cobra.Command{
 func init() {
     deployCmd.Flags().BoolVar(&deployNow, "now", false, "run deploy.sh now")
 }
-

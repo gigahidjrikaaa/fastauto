@@ -4,7 +4,7 @@ import (
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
-    "fastauto/internal/webhook"
+    "github.com/gigahidjrikaaa/fastauto/internal/webhook"
 )
 
 var internalServeWebhookCmd = &cobra.Command{

@@ -6,7 +6,7 @@ import (
     "github.com/spf13/cobra"
     "github.com/spf13/viper"
 
-    "fastauto/internal/systemd"
+    "github.com/gigahidjrikaaa/fastauto/internal/systemd"
 )
 
 var statusCmd = &cobra.Command{
@@ -24,4 +24,3 @@ var statusCmd = &cobra.Command{
         return nil
     },
 }
-

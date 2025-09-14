@@ -9,10 +9,10 @@ import (
 
     "github.com/spf13/viper"
 
-    "fastauto/internal/config"
-    "fastauto/internal/deploy"
-    "fastauto/internal/gitutil"
-    "fastauto/internal/match"
+    "github.com/gigahidjrikaaa/fastauto/internal/config"
+    "github.com/gigahidjrikaaa/fastauto/internal/deploy"
+    "github.com/gigahidjrikaaa/fastauto/internal/gitutil"
+    "github.com/gigahidjrikaaa/fastauto/internal/match"
 )
 
 type pushEvent struct {

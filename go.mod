@@ -1,4 +1,4 @@
-module fastauto
+module github.com/gigahidjrikaaa/fastauto
 
 go 1.22
 
