@@ -17,7 +17,8 @@ builds:
     binary: fastauto
 
 archives:
-  - formats: [tar.gz]
+  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats: [tar.gz]
     files:
       - LICENSE
       - README.md
@@ -31,3 +32,14 @@ changelog:
 release:
   prerelease: auto
 
+nfpms:
+  - id: fastauto
+    package_name: fastauto
+    homepage: "https://github.com/gigahidjrikaaa/fastauto"
+    maintainer: "fastauto contributors"
+    description: "Fast, safe autopull + auto-deploy for any Git repo"
+    license: MIT
+    formats: [deb, rpm, apk]
+    bindir: "/usr/local/bin"
+    builds:
+      - fastauto

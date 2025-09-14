@@ -45,6 +45,27 @@ You can run fastauto in two simple modes:
 
 ## Installation
 
+### Quick install
+
+Option A — Go toolchain (recommended if you have Go):
+
+```bash
+GOFLAGS=-trimpath CGO_ENABLED=0 go install github.com/gigahidjrikaaa/fastauto/cmd/fastauto@latest
+export PATH="$(go env GOPATH)/bin:$PATH"  # if not already
+fastauto version
+```
+
+Option B — Build, then self-install to your PATH:
+
+```bash
+git clone https://github.com/gigahidjrikaaa/fastauto.git
+cd fastauto
+go build -o bin/fastauto ./cmd/fastauto
+./bin/fastauto self install
+# Re-open your shell if ~/.local/bin was added
+fastauto version
+```
+
 ### From source (needs Go 1.22+)
 
 ```bash
@@ -52,7 +73,7 @@ git clone https://github.com/gigahidjrikaaa/fastauto.git
 cd fastauto
 go build -o bin/fastauto ./cmd/fastauto
 # or
-go install ./cmd/fastauto
+GOFLAGS=-trimpath CGO_ENABLED=0 go install ./cmd/fastauto
 ```
 
 ### From releases (recommended)
@@ -219,6 +240,9 @@ fastauto deploy --now
 - `secret show`: Prints the current webhook secret and config path.
 - `uninstall`: Stops, disables, and removes the systemd unit.
 - `version`: Prints version info.
+- `self install [--bin-dir DIR]`: Install this binary into your PATH (defaults to `~/.local/bin` or `/usr/local/bin` as root).
+- `self uninstall [--bin-dir DIR]`: Remove the installed binary.
+- `completion [bash|zsh|fish|powershell]`: Generate shell completion script.
 
 ## Configuration Files
 
