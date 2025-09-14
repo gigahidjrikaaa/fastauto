@@ -1,6 +1,19 @@
 fastauto
 =========
 
+<div align="left">
+
+[![CI](https://github.com/gigahidjrikaaa/fastauto/actions/workflows/ci.yml/badge.svg)](https://github.com/gigahidjrikaaa/fastauto/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/gigahidjrikaaa/fastauto?display_name=tag&sort=semver)](https://github.com/gigahidjrikaaa/fastauto/releases)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/gigahidjrikaaa/fastauto)](go.mod)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gigahidjrikaaa/fastauto)](https://goreportcard.com/report/github.com/gigahidjrikaaa/fastauto)
+[![lint](https://img.shields.io/badge/lint-golangci--lint-blue)](https://golangci-lint.run)
+[![Downloads](https://img.shields.io/github/downloads/gigahidjrikaaa/fastauto/total.svg)](https://github.com/gigahidjrikaaa/fastauto/releases)
+[![Platforms](https://img.shields.io/badge/platform-linux%20amd64%20%7C%20arm64-2ea44f)](#)
+
+</div>
+
 Fastauto is a tiny, safe tool that keeps your Git repo up‑to‑date and runs your deploy script automatically. One command sets it up; after that, pushes to your repo deploy your code.
 
 You can run fastauto in two simple modes:
@@ -95,4 +108,3 @@ Uninstall
 
 License
 - MIT — see LICENSE
-
