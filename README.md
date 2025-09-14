@@ -1,7 +1,4 @@
-fastauto
-=========
-
-<div align="left">
+# fastauto
 
 [![CI](https://github.com/gigahidjrikaaa/fastauto/actions/workflows/ci.yml/badge.svg)](https://github.com/gigahidjrikaaa/fastauto/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/gigahidjrikaaa/fastauto?display_name=tag&sort=semver)](https://github.com/gigahidjrikaaa/fastauto/releases)
@@ -12,105 +9,207 @@ fastauto
 [![Downloads](https://img.shields.io/github/downloads/gigahidjrikaaa/fastauto/total.svg)](https://github.com/gigahidjrikaaa/fastauto/releases)
 [![Platforms](https://img.shields.io/badge/platform-linux%20amd64%20%7C%20arm64-2ea44f)](#)
 
-</div>
-
-Fastauto is a tiny, safe tool that keeps your Git repo up‑to‑date and runs your deploy script automatically. One command sets it up; after that, pushes to your repo deploy your code.
+Fastauto is a tiny, safe tool that keeps your Git repo up-to-date and runs your deploy script automatically. One command sets it up; after that, pushes to your repo deploy your code.
 
 You can run fastauto in two simple modes:
 - Webhook Mode: Runs a small HTTP server that verifies GitHub webhooks (HMAC) and runs `deploy.sh` on pushes.
 - Runner Mode: Installs a self‑hosted GitHub Actions runner and adds a minimal workflow that runs `deploy.sh` on pushes.
 
-Highlights
+## Highlights
+
 - Single static CLI binary (Linux amd64/arm64)
-- Beginner‑friendly setup with safe defaults
+- Beginner-friendly setup with safe defaults
 - Commands: `init`, `install`, `status`, `logs`, `deploy --now`, `secret rotate`, `uninstall`, `version`
 - Config lives in your repo (`.fastauto.yml`) and globally (`$XDG_CONFIG_HOME/fastauto/config.yml`)
 - Journald logging, idempotent writes, backups, and atomic secret rotation
 
-Supported Platforms
+## Supported Platforms
+
 - Linux x86_64 (amd64) and ARM64 (aarch64)
 
-Install
-- From source (needs Go 1.22+):
-  - `git clone <this repo>`
-  - `cd fastauto`
-  - `go build -o bin/fastauto ./cmd/fastauto`
-  - Optionally: `go install ./cmd/fastauto`
+## Table of Contents
 
-- From releases (recommended):
-  - Download the tarball for your platform from Releases
-  - Extract and place `fastauto` somewhere in your `PATH` (e.g., `/usr/local/bin`)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Webhook Mode](#webhook-mode)
+  - [HTTPS/TLS](#https-tls)
+- [Runner Mode](#runner-mode)
+- [Tokens & Credentials](#tokens--credentials)
+- [Commands Reference](#commands-reference)
+- [Configuration Files](#configuration-files)
+- [Deploy Script](#deploy-script)
+- [Troubleshooting](#troubleshooting)
+- [Security Notes](#security-notes)
+- [Uninstall](#uninstall)
+- [License](#license)
 
-Quick Start (Most Users)
-1) Go to your app’s Git repo on the server: `cd /path/to/your/repo`
-2) Initialize fastauto and choose a mode when prompted:
-   - `fastauto init`
-   - This writes `.fastauto.yml`, adds `deploy.sh` (if missing), and can install a systemd unit for you.
-3) Install and start the service: `fastauto install`
-4) Watch logs: `fastauto logs -f`
+## Installation
 
-Using Webhook Mode
-- During `fastauto init`, choose “webhook” (or run: `fastauto init --mode webhook --port 8080`).
+### From source (needs Go 1.22+)
+
+```bash
+git clone https://github.com/gigahidjrikaaa/fastauto.git
+cd fastauto
+go build -o bin/fastauto ./cmd/fastauto
+# or
+go install ./cmd/fastauto
+```
+
+### From releases (recommended)
+
+1. Download the tarball for your platform from the Releases page
+2. Extract and place `fastauto` somewhere in your `PATH` (e.g., `/usr/local/bin`)
+
+## Quick Start
+
+1. Go to your app's Git repo on the server:
+
+   ```bash
+   cd /path/to/your/repo
+   ```
+
+2. Initialize fastauto and choose a mode when prompted:
+
+   ```bash
+   fastauto init
+   ```
+
+   This writes `.fastauto.yml`, adds `deploy.sh` (if missing), and can install a systemd unit for you.
+
+3. Install and start the service:
+
+   ```bash
+   fastauto install
+   ```
+
+4. Watch logs:
+
+   ```bash
+   fastauto logs -f
+   ```
+
+## Webhook Mode
+
+- During init, choose "webhook" or run:
+
+  ```bash
+  fastauto init --mode webhook --port 8080
+  ```
+
 - Create a GitHub webhook pointing to `http://your-server:8080/hook`.
-  - Secret lives in `$XDG_CONFIG_HOME/fastauto/config.yml` (auto‑generated if missing).
+  - Secret lives in `$XDG_CONFIG_HOME/fastauto/config.yml` (auto-generated if missing).
 - On each push (matching your configured branches), fastauto does a `git pull --ff-only` and runs `./deploy.sh`.
 
-Optional HTTPS for Webhooks
-- Add to `.fastauto.yml`:
-  - `webhook.address: ":8443"`
-  - `webhook.tls_cert_file: "/path/to/cert.pem"`
-  - `webhook.tls_key_file: "/path/to/key.pem"`
-- Or set env vars: `FASTAUTO_WEBHOOK_TLS_CERT_FILE` and `FASTAUTO_WEBHOOK_TLS_KEY_FILE`.
+### HTTPS / TLS
 
-Using Runner Mode
-- During `fastauto init`, choose “runner” (or run: `fastauto init --mode runner`).
-- `fastauto install` will add a systemd unit for the runner and write `.github/workflows/fastauto.yml`.
+Add to `.fastauto.yml`:
+
+```yaml
+webhook:
+  address: ":8443"
+  tls_cert_file: "/path/to/cert.pem"
+  tls_key_file: "/path/to/key.pem"
+```
+
+Or set environment variables:
+
+```bash
+export FASTAUTO_WEBHOOK_TLS_CERT_FILE=/path/to/cert.pem
+export FASTAUTO_WEBHOOK_TLS_KEY_FILE=/path/to/key.pem
+```
+
+## Runner Mode
+
+- During init, choose "runner" or run:
+
+  ```bash
+  fastauto init --mode runner
+  ```
+
+- Install the service and write the workflow:
+
+  ```bash
+  fastauto install
+  ```
+
 - Configure the runner with an ephemeral token:
-  - `cd .fastauto/runner`
-  - `GH_REPO_URL=https://github.com/OWNER/REPO GH_TOKEN=YOUR_SHORT_LIVED_TOKEN ./install_runner.sh`
+
+  ```bash
+  cd .fastauto/runner
+  GH_REPO_URL=https://github.com/OWNER/REPO \
+  GH_TOKEN=$(gh api -X POST repos/OWNER/REPO/actions/runners/registration-token -q .token) \
+  ./install_runner.sh
+  ```
+
 - The `fastauto-runner.service` supervises the runner; pushes will trigger the workflow, which runs `./deploy.sh`.
 
-Tokens & Credentials
---------------------
+## Tokens & Credentials
 
-Webhook Secret (for Webhook Mode)
+### Webhook Secret (Webhook Mode)
+
 - Where: stored in `$XDG_CONFIG_HOME/fastauto/config.yml` under `webhook_secret`.
-- How it’s created: auto‑generated by `fastauto install` if missing.
+- How it's created: auto-generated by `fastauto install` if missing.
 - How to use in GitHub:
-  - Repo → Settings → Webhooks → Add webhook
-  - Payload URL: `http://your-server:8080/hook` (or your TLS URL)
-  - Content type: `application/json`
-  - Secret: paste the value from the global config file
-  - Events: “Just the push event”
+  1. Repo → Settings → Webhooks → Add webhook
+  2. Payload URL: `http://your-server:8080/hook` (or your TLS URL)
+  3. Content type: `application/json`
+  4. Secret: paste the value from the global config file
+  5. Events: "Just the push event"
 - Rotate anytime: `fastauto secret rotate` (then update the webhook Secret in GitHub).
-  - Show current value locally: `fastauto secret show`
+- Show current value locally: `fastauto secret show`
 
-Git Credentials for Autopull
-- The server must be able to `git pull` your repo:
-  - Recommended: SSH Deploy Key
-    - Generate: `ssh-keygen -t ed25519 -C "fastauto@$(hostname)"`
-    - Add the public key to GitHub → Repo → Settings → Deploy keys → “Add deploy key” (read‑only is enough)
-    - Ensure your repo remote uses SSH: `git remote set-url origin git@github.com:OWNER/REPO.git`
-  - Alternative: HTTPS with a Personal Access Token (PAT)
-    - Create a fine‑scoped token with read access to the repo
-    - Use Git’s credential helper or embed once to update remote:
-      `git remote set-url origin https://<TOKEN>@github.com/OWNER/REPO.git`
+### Git Credentials for Autopull
 
-Runner Registration Token (for Runner Mode)
+The server must be able to `git pull` your repo:
+
+- Recommended: SSH Deploy Key
+
+  ```bash
+  ssh-keygen -t ed25519 -C "fastauto@$(hostname)"
+  # Add the public key to GitHub → Repo → Settings → Deploy keys (read-only)
+  git remote set-url origin git@github.com:OWNER/REPO.git
+  ```
+
+- Alternative: HTTPS with a Personal Access Token (PAT)
+
+  ```bash
+  # Create a fine-scoped token with read access to the repo
+  git remote set-url origin https://<TOKEN>@github.com/OWNER/REPO.git
+  ```
+
+### Runner Registration Token (Runner Mode)
+
 - Where in GitHub UI:
-  - Repo → Settings → Actions → Runners → “New self‑hosted runner” → copy the registration token
-  - For org runners: Organization → Settings → Actions → Runners → “New runner”
+  - Repo → Settings → Actions → Runners → "New self-hosted runner" → copy the registration token
+  - For org runners: Organization → Settings → Actions → Runners → "New runner"
 - CLI/API alternative (requires permissions):
-  - Repo token: `gh api -X POST repos/OWNER/REPO/actions/runners/registration-token -q .token`
-  - Org token: `gh api -X POST orgs/ORG/actions/runners/registration-token -q .token`
+
+  ```bash
+  # Repo-scoped token
+  gh api -X POST repos/OWNER/REPO/actions/runners/registration-token -q .token
+  # Org-scoped token
+  gh api -X POST orgs/ORG/actions/runners/registration-token -q .token
+  ```
+
 - Use with installer:
-  - `cd .fastauto/runner`
-  - `GH_REPO_URL=https://github.com/OWNER/REPO GH_TOKEN=$(gh api -X POST repos/OWNER/REPO/actions/runners/registration-token -q .token) ./install_runner.sh`
 
-Manual Deploy
-- Run your deploy script on demand: `fastauto deploy --now`
+  ```bash
+  cd .fastauto/runner
+  GH_REPO_URL=https://github.com/OWNER/REPO \
+  GH_TOKEN=$(gh api -X POST repos/OWNER/REPO/actions/runners/registration-token -q .token) \
+  ./install_runner.sh
+  ```
 
-Commands Reference
+## Manual Deploy
+
+Run your deploy script on demand:
+
+```bash
+fastauto deploy --now
+```
+
+## Commands Reference
+
 - `init`: Detects repo, branch, writes `.fastauto.yml` and `deploy.sh` (if missing), and can install units.
 - `install`: Installs and enables the systemd service for your chosen mode.
 - `status`: Shows systemd service status.
@@ -121,28 +220,50 @@ Commands Reference
 - `uninstall`: Stops, disables, and removes the systemd unit.
 - `version`: Prints version info.
 
-Configuration Files
+## Configuration Files
+
 - Repo: `./.fastauto.yml` (mode, branches, webhook address and TLS, etc.)
 - Global: `$XDG_CONFIG_HOME/fastauto/config.yml` (webhook secret)
 
-Deploy Script (`deploy.sh`)
-- A simple Bash script that you control. The default template does:
-  - `git pull --ff-only`
-  - If Node project: `npm ci && npm run build`
-  - If Go project: `go build ./...`
-- Put your real deploy steps here (restart services, copy files, etc.).
+Example `.fastauto.yml`:
 
-Troubleshooting
+```yaml
+mode: webhook
+repo_path: /path/to/your/repo
+branches: ["main"]
+webhook:
+  address: ":8080"
+  # tls_cert_file: "/path/to/cert.pem"
+  # tls_key_file: "/path/to/key.pem"
+# runner:
+#   labels: ["self-hosted", "linux", "x64"]
+```
+
+## Deploy Script
+
+A simple Bash script that you control. The default template does:
+
+- `git pull --ff-only`
+- If Node project: `npm ci && npm run build`
+- If Go project: `go build ./...`
+
+Put your real deploy steps here (restart services, copy files, etc.).
+
+## Troubleshooting
+
 - Check service state: `fastauto status`
 - Follow logs: `fastauto logs -f`
 - See TROUBLESHOOTING.md for common fixes.
 
-Security Notes
-- Every webhook is HMAC‑verified using the secret in global config.
+## Security Notes
+
+- Every webhook is HMAC-verified using the secret in global config.
 - Secrets are rotated atomically and existing files are backed up with timestamps.
 
-Uninstall
-- `fastauto uninstall` removes the systemd unit. Delete `.fastauto.yml` and scripts if you no longer need them.
+## Uninstall
 
-License
-- MIT — see LICENSE
+`fastauto uninstall` removes the systemd unit. Delete `.fastauto.yml` and scripts if you no longer need them.
+
+## License
+
+MIT — see `LICENSE`
